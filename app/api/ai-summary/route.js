@@ -5,10 +5,10 @@ export async function POST(request) {
     const body = await request.json();
     const { water_name, risk_label, metrics, user_zip } = body;
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      console.error("NO OPENAI API KEY FOUND");
+      console.error("NO GROQ API KEY FOUND");
       throw new Error("No API key");
     }
 
@@ -19,24 +19,24 @@ export async function POST(request) {
 
 Write 2-3 sentences describing your current condition in a personal, emotional way. Then on a new line write "Actions:" followed by exactly 5 specific actions local residents can take to help you. Keep the whole response under 150 words. End with a safety note if risk is HIGH.`;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: "llama-3.3-70b-versatile",
         max_tokens: 300,
         messages: [{ role: "user", content: prompt }]
       })
     });
 
     const data = await response.json();
-    console.log("OpenAI response status:", response.status);
+    console.log("Groq response status:", response.status);
 
     if (!response.ok) {
-      console.error("OpenAI error:", data);
+      console.error("Groq error:", data);
       throw new Error(data.error?.message ?? "API call failed");
     }
 
