@@ -1,11 +1,33 @@
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: 'sans-serif', background: 'linear-gradient(to bottom, #0A2342, #0E6B8A)' }}>
-        <nav style={{ padding: '10px', background: '#0E6B8A', color: 'white' }}>
-          <a href="/home" style={{ marginRight: '15px', color: 'white' }}>Home</a>
-          <a href="/dashboard" style={{ marginRight: '15px', color: 'white' }}>Dashboard</a>
-          <a href="/game" style={{ color: 'white' }}>Mini-Game</a>
+      <body style={{ margin: 0, fontFamily: 'sans-serif' }}>
+        <nav style={{
+          padding: '14px 24px',
+          background: 'rgba(10, 35, 66, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.1rem', marginRight: '16px' }}>🌊 TideCheck</span>
+          <a href="/home" style={{
+            color: '#90CAF9',
+            textDecoration: 'none',
+            padding: '6px 14px',
+            borderRadius: '20px',
+            fontSize: '0.9rem',
+            border: '1px solid rgba(144,202,249,0.3)'
+          }}>Home</a>
+          <a href="/dashboard" style={{
+            color: '#90CAF9',
+            textDecoration: 'none',
+            padding: '6px 14px',
+            borderRadius: '20px',
+            fontSize: '0.9rem',
+            border: '1px solid rgba(144,202,249,0.3)'
+          }}>Dashboard</a>
         </nav>
         {children}
       </body>
