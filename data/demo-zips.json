@@ -1,0 +1,47 @@
+[
+  {
+    "zip": "44102",
+    "water_name": "Lake Erie",
+    "risk_score": 45,
+    "risk_label": "MEDIUM",
+    "metrics": { "turbidity": 5, "temperature": 22, "dissolved_oxygen": 6.5, "pH": 7.8 },
+    "last_updated": "2026-03-06T12:00:00Z",
+    "source_url": "https://www.usgs.gov/"
+  },
+  {
+    "zip": "33139",
+    "water_name": "Biscayne Bay",
+    "risk_score": 30,
+    "risk_label": "LOW",
+    "metrics": { "turbidity": 2, "temperature": 25, "dissolved_oxygen": 8, "pH": 7.5 },
+    "last_updated": "2026-03-06T12:00:00Z",
+    "source_url": "https://www.usgs.gov/"
+  },
+  {
+    "zip": "98101",
+    "water_name": "Puget Sound",
+    "risk_score": 65,
+    "risk_label": "HIGH",
+    "metrics": { "turbidity": 9, "temperature": 20, "dissolved_oxygen": 4, "pH": 8.1 },
+    "last_updated": "2026-03-06T12:00:00Z",
+    "source_url": "https://www.usgs.gov/"
+  },
+  {
+    "zip": "77002",
+    "water_name": "Houston Bayou",
+    "risk_score": 55,
+    "risk_label": "MEDIUM",
+    "metrics": { "turbidity": 7, "temperature": 28, "dissolved_oxygen": 5.5, "pH": 7.9 },
+    "last_updated": "2026-03-06T12:00:00Z",
+    "source_url": "https://www.usgs.gov/"
+  },
+  {
+    "zip": "60601",
+    "water_name": "Lake Michigan",
+    "risk_score": 35,
+    "risk_label": "LOW",
+    "metrics": { "turbidity": 3, "temperature": 21, "dissolved_oxygen": 7.5, "pH": 7.7 },
+    "last_updated": "2026-03-06T12:00:00Z",
+    "source_url": "https://www.usgs.gov/"
+  }
+]

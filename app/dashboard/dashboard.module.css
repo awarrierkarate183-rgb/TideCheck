@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.dashboard {
+  position: relative;
+  padding: 30px;
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #0a2342, #0e6b8a); /* deep ocean gradient */
+  color: #fff;
+  overflow: hidden;
+}
+
+.waterBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, #1e90ff, #0e6b8a);
+  z-index: -1;
+  animation: waterMove 10s infinite alternate;
+}
+
+@keyframes waterMove {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-15px); }
+}
+
+.riskBadge {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 1.8rem;
+  border-radius: 50px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mapContainer {
+  margin-bottom: 25px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.aiCard {
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.aiCard ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.aiCard li {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.aiCard input[type="checkbox"] {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+}
+
+.safetyNote {
+  font-weight: bold;
+  color: #f39c12;
+  margin-top: 10px;
+}
+
+.footer {
+  margin-top: 30px;
+  font-size: 0.85rem;
+  color: #ccc;
+}
