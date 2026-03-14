@@ -17,7 +17,7 @@ export async function POST(request) {
 - Risk Level: ${risk_label}
 - Location ZIP: ${user_zip}
 
-Write 2-3 sentences describing your current condition in a personal, emotional way. Then on a new line write "Actions:" followed by exactly 5 specific actions local residents can take to help you. Keep the whole response under 150 words. End with a safety note if risk is HIGH.`;
+Write 4-5 sentences describing your current condition in a deeply personal, emotional, and vivid way. Describe what you look like, what you feel, and what is happening to your ecosystem. Make it powerful and moving. Then on a new line write "Actions:" followed by exactly 5 very specific actions local residents in ZIP ${user_zip} can take to help you. Keep the total response under 250 words. If risk is HIGH end with a safety warning.`;
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -27,13 +27,12 @@ Write 2-3 sentences describing your current condition in a personal, emotional w
       },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
-        max_tokens: 300,
+        max_tokens: 400,
         messages: [{ role: "user", content: prompt }]
       })
     });
 
     const data = await response.json();
-    console.log("Groq response status:", response.status);
 
     if (!response.ok) {
       console.error("Groq error:", data);
@@ -57,7 +56,7 @@ Write 2-3 sentences describing your current condition in a personal, emotional w
   } catch (err) {
     console.error("AI summary error:", err.message);
     return NextResponse.json({
-      summary: "I am your local water body. Right now I need your help to stay healthy.",
+      summary: "I am your local water body. Right now I need your help to stay healthy. My waters are struggling and the ecosystem within me is suffering. Every action you take makes a real difference to my future.",
       actions: [
         "Reduce fertilizer use within 100ft of any drain",
         "Pick up pet waste before the next rain",
