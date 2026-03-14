@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>River Guardian - HAB Game</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #f5f5f2; padding: 1rem; }
+#game { width: 100%; max-width: 800px; margin: 0 auto; }
+#hud { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; margin-bottom: 1rem; }
+.stat { background: #ececea; border-radius: 8px; padding: 10px 12px; }
+.stat-label { font-size: 12px; color: #5f5e5a; margin-bottom: 2px; }
+.stat-val { font-size: 20px; font-weight: 500; color: #2c2c2a; }
+#river-wrap { position: relative; width: 100%; height: 320px; border-radius: 12px; overflow: hidden; border: 0.5px solid #d3d1c7; }
+#river-canvas { display: block; width: 100%; height: 100%; }
+#toolbar { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.tool-btn { flex: 1; min-width: 110px; padding: 8px 10px; font-size: 13px; font-family: system-ui, sans-serif; border-radius: 8px; border: 0.5px solid #b4b2a9; background: #fff; color: #2c2c2a; cursor: pointer; transition: background 0.15s; }
+.tool-btn:hover { background: #ececea; }
+.tool-btn.active { background: #185FA5; color: #E6F1FB; border-color: #185FA5; }
+.tool-btn.danger { border-color: #A32D2D; color: #A32D2D; }
+.tool-btn.danger:hover { background: #FCEBEB; }
+#log { margin-top: 10px; font-size: 12px; color: #5f5e5a; min-height: 20px; }
+#overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.55); border-radius: 12px; }
+#overlay-box { background: #fff; border-radius: 12px; padding: 2rem; text-align: center; max-width: 280px; }
+#overlay-box h2 { font-size: 18px; font-weight: 500; margin-bottom: 8px; color: #2c2c2a; }
+#overlay-box p { font-size: 14px; color: #5f5e5a; margin-bottom: 1.5rem; line-height: 1.6; }
+#overlay-box button { padding: 8px 24px; font-size: 14px; font-family: system-ui, sans-serif; border-radius: 8px; border: 0.5px solid #b4b2a9; background: #185FA5; color: #E6F1FB; cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="hud">
+    <div class="stat"><div class="stat-label">River health</div><div class="stat-val" id="s-health">100%</div></div>
+    <div class="stat"><div class="stat-label">Algae blooms</div><div class="stat-val" id="s-blooms">0</div></div>
+    <div class="stat"><div class="stat-label">Population</div><div class="stat-val" id="s-pop">50</div></div>
+    <div class="stat"><div class="stat-label">Score</div><div class="stat-val" id="s-score">0</div></div>
+  </div>
+
+  <div id="river-wrap">
+    <canvas id="river-canvas"></canvas>
+    <div id="overlay">
+      <div id="overlay-box">
+        <h2 id="overlay-title">River Guardian</h2>
+        <p id="overlay-msg">Protect the river from harmful algal blooms. Click blooms to treat them. Manage population runoff and oxygen levels.</p>
+        <button onclick="startGame()">Start</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toolbar">
+    <button class="tool-btn active" id="btn-treat" onclick="setTool('treat')">Treat bloom</button>
+    <button class="tool-btn" id="btn-aerate" onclick="setTool('aerate')">Aerate water</button>
+    <button class="tool-btn" id="btn-barrier" onclick="setTool('barrier')">Add barrier</button>
+    <button class="tool-btn danger" onclick="reducePop()">Reduce runoff</button>
+  </div>
+  <div id="log">Click a tool, then click on the river to use it.</div>
+</div>
+
+<script>
+const canvas = document.getElementById('river-canvas');
+const ctx = canvas.getContext('2d');
+const wrap = document.getElementById('river-wrap');
+const overlay = document.getElementById('overlay');
+
+let W, H, tool = 'treat', score = 0, health = 100, population = 50, tick = 0, running = false, raf;
+let blooms = [], particles = [], barriers = [], aerators = [], fish = [];
+
+function resize() {
+  W = wrap.clientWidth; H = wrap.clientHeight;
+  canvas.width = W; canvas.height = H;
+}
+
+function setTool(t) {
+  tool = t;
+  ['treat','aerate','barrier'].forEach(id => {
+    document.getElementById('btn-' + id).classList.toggle('active', id === t);
+  });
+}
+
+function rnd(a, b) { return a + Math.random() * (b - a); }
+
+function spawnBloom() {
+  blooms.push({ x: rnd(0.05, 0.95), y: rnd(0.18, 0.82), r: rnd(18, 38), age: 0, opacity: 0, growing: true });
+}
+
+function spawnFish() {
+  fish.push({ x: -0.05, y: rnd(0.25, 0.75), speed: rnd(0.0008, 0.0018), vy: 0, alive: true });
+}
+
+function spawnParticle(x, y, color) {
+  for (let i = 0; i < 8; i++)
+    particles.push({ x, y, vx: rnd(-2,2), vy: rnd(-2,2), life: 1, color });
+}
+
+function startGame() {
+  blooms = []; particles = []; barriers = []; aerators = []; fish = [];
+  score = 0; health = 100; population = 50; tick = 0; running = true;
+  overlay.style.display = 'none';
+  for (let i = 0; i < 3; i++) spawnFish();
+  loop();
+}
+
+function endGame(msg) {
+  running = false;
+  cancelAnimationFrame(raf);
+  document.getElementById('overlay-title').textContent = msg;
+  document.getElementById('overlay-msg').textContent = `Final score: ${score}. The river ${health <= 0 ? 'was lost to algae' : 'survived!'}.`;
+  overlay.style.display = 'flex';
+}
+
+function reducePop() {
+  if (population > 10) {
+    population = Math.max(10, population - 10);
+    score += 5;
+    document.getElementById('log').textContent = 'Runoff reduced. Less nutrients entering the river.';
+  } else {
+    document.getElementById('log').textContent = 'Population is already well managed.';
+  }
+}
+
+function drawRiver() {
+  ctx.fillStyle = '#B5D4F4';
+  ctx.fillRect(0, 0, W, H * 0.15);
+
+  const rGrad = ctx.createLinearGradient(0, H * 0.15, 0, H * 0.92);
+  rGrad.addColorStop(0, '#1D9E75');
+  rGrad.addColorStop(0.3, '#0F6E56');
+  rGrad.addColorStop(0.7, '#1D9E75');
+  rGrad.addColorStop(1, '#085041');
+  ctx.fillStyle = rGrad;
+  ctx.fillRect(0, H * 0.15, W, H * 0.77);
+
+  ctx.fillStyle = '#639922';
+  ctx.fillRect(0, 0, W, H * 0.17);
+  ctx.fillRect(0, H * 0.88, W, H * 0.12);
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    const yy = H * (0.25 + i * 0.13);
+    ctx.beginPath();
+    ctx.moveTo(0, yy);
+    ctx.bezierCurveTo(W * 0.25, yy - 6, W * 0.75, yy + 6, W, yy);
+    ctx.stroke();
+  }
+}
+
+function drawBlooms() {
+  blooms.forEach(b => {
+    const bx = b.x * W, by = b.y * H;
+    const grd = ctx.createRadialGradient(bx, by, 0, bx, by, b.r * (W / 600));
+    const alpha = Math.min(b.opacity, 0.85);
+    grd.addColorStop(0, `rgba(186,117,23,${alpha})`);
+    grd.addColorStop(0.5, `rgba(99,153,34,${alpha * 0.7})`);
+    grd.addColorStop(1, `rgba(99,153,34,0)`);
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(bx, by, b.r * (W / 600) * 1.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = `rgba(239,159,39,${alpha * 0.6})`;
+    for (let d = 0; d < 5; d++) {
+      const ang = (d / 5) * Math.PI * 2 + b.age * 0.01;
+      const dr = b.r * 0.5 * (W / 600);
+      ctx.beginPath();
+      ctx.arc(bx + Math.cos(ang) * dr, by + Math.sin(ang) * dr, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+}
+
+function drawBarriers() {
+  barriers.forEach(b => {
+    ctx.fillStyle = '#3C3489';
+    ctx.fillRect(b.x * W - 4, H * 0.18, 8, H * 0.68);
+    ctx.fillStyle = '#AFA9EC';
+    for (let i = 0; i < 5; i++) {
+      ctx.fillRect(b.x * W - 6, H * 0.22 + i * (H * 0.12), 12, 6);
+    }
+  });
+}
+
+function drawAerators() {
+  aerators.forEach(a => {
+    const ax = a.x * W, ay = a.y * H;
+    ctx.strokeStyle = 'rgba(181,212,244,0.7)';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.arc(ax, ay, (a.age % 40 + i * 13) % 45, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#185FA5';
+    ctx.beginPath();
+    ctx.arc(ax, ay, 5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawFish() {
+  fish.filter(f => f.alive).forEach(f => {
+    const fx = f.x * W, fy = f.y * H;
+    ctx.fillStyle = '#E6F1FB';
+    ctx.beginPath();
+    ctx.ellipse(fx, fy, 10, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(fx - 10, fy);
+    ctx.lineTo(fx - 16, fy - 5);
+    ctx.lineTo(fx - 16, fy + 5);
+    ctx.closePath();
+    ctx.fill();
+  });
+}
+
+function drawParticles() {
+  particles.forEach(p => {
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawHud() {
+  const bw = W - 20, bh = 6;
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.fillRect(10, H - 14, bw, bh);
+  const hColor = health > 60 ? '#1D9E75' : health > 30 ? '#BA7517' : '#E24B4A';
+  ctx.fillStyle = hColor;
+  ctx.fillRect(10, H - 14, bw * (health / 100), bh);
+}
+
+function update() {
+  tick++;
+
+  const spawnChance = 0.008 + (population / 50) * 0.012;
+  if (Math.random() < spawnChance) spawnBloom();
+
+  if (tick % 300 === 0 && fish.filter(f => f.alive).length < 6) spawnFish();
+
+  blooms.forEach(b => {
+    b.age++;
+    if (b.growing) {
+      b.opacity = Math.min(1, b.opacity + 0.01);
+      if (b.opacity >= 0.9) b.growing = false;
+    }
+    health -= 0.015 * b.opacity;
+
+    aerators.forEach(a => {
+      const dx = (b.x - a.x) * W, dy = (b.y - a.y) * H;
+      if (Math.sqrt(dx * dx + dy * dy) < 80) {
+        b.opacity = Math.max(0, b.opacity - 0.005);
+      }
+    });
+
+    b.x += rnd(-0.0005, 0.0008);
+    b.y += rnd(-0.0003, 0.0003);
+    b.x = Math.max(0.02, Math.min(0.98, b.x));
+    b.y = Math.max(0.2, Math.min(0.85, b.y));
+  });
+
+  blooms = blooms.filter(b => b.opacity > 0.02);
+
+  fish.filter(f => f.alive).forEach(f => {
+    f.x += f.speed;
+    blooms.forEach(b => {
+      const dx = (f.x - b.x) * W, dy = (f.y - b.y) * H;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 60) { f.vy += (dy / dist) * 0.3; }
+    });
+    f.vy *= 0.9;
+    f.y = Math.max(0.22, Math.min(0.84, f.y + f.vy * 0.01));
+    if (f.x > 1.1) { f.x = -0.05; f.y = rnd(0.25, 0.75); f.vy = 0; score++; }
+  });
+
+  aerators.forEach(a => a.age++);
+
+  particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.04; p.vx *= 0.92; p.vy *= 0.92; });
+  particles = particles.filter(p => p.life > 0);
+
+  if (blooms.length === 0 && health < 100) health = Math.min(100, health + 0.05);
+  health = Math.max(0, Math.min(100, health));
+
+  if (tick % 60 === 0) score += Math.max(0, Math.floor((health / 100) * 3));
+
+  document.getElementById('s-health').textContent = Math.round(health) + '%';
+  document.getElementById('s-health').style.color = health > 60 ? '#2c2c2a' : health > 30 ? '#BA7517' : '#E24B4A';
+  document.getElementById('s-blooms').textContent = blooms.length;
+  document.getElementById('s-pop').textContent = population;
+  document.getElementById('s-score').textContent = score;
+
+  if (health <= 0) { endGame('River lost'); return; }
+  if (tick > 3600 && health > 80) { endGame('River saved!'); return; }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  drawRiver();
+  drawBarriers();
+  drawBlooms();
+  drawAerators();
+  drawFish();
+  drawParticles();
+  drawHud();
+}
+
+function loop() {
+  if (!running) return;
+  update();
+  draw();
+  raf = requestAnimationFrame(loop);
+}
+
+canvas.addEventListener('click', e => {
+  if (!running) return;
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / W;
+  const my = (e.clientY - rect.top) / H;
+
+  if (tool === 'treat') {
+    let hit = false;
+    blooms.forEach(b => {
+      const dx = (mx - b.x) * W, dy = (my - b.y) * H;
+      if (Math.sqrt(dx * dx + dy * dy) < b.r * (W / 600) * 1.6) {
+        spawnParticle(mx * W, my * H, '#1D9E75');
+        b.opacity = Math.max(0, b.opacity - 0.45);
+        score += 10;
+        hit = true;
+        document.getElementById('log').textContent = 'Bloom treated! +10 points.';
+      }
+    });
+    blooms = blooms.filter(b => b.opacity > 0.02);
+    if (!hit) document.getElementById('log').textContent = 'No bloom here — click directly on a yellow-green patch.';
+
+  } else if (tool === 'aerate') {
+    if (aerators.length < 5) {
+      aerators.push({ x: mx, y: my, age: 0 });
+      score -= 5;
+      document.getElementById('log').textContent = 'Aerator placed. Increases oxygen and slows nearby blooms.';
+    } else {
+      document.getElementById('log').textContent = 'Max 5 aerators active at once.';
+    }
+
+  } else if (tool === 'barrier') {
+    if (barriers.length < 4) {
+      barriers.push({ x: mx });
+      document.getElementById('log').textContent = 'Barrier placed. Limits bloom spread downstream.';
+    } else {
+      document.getElementById('log').textContent = 'Max 4 barriers at once.';
+    }
+  }
+});
+
+resize();
+window.addEventListener('resize', () => { resize(); if (!running) draw(); });
+</script>
+</body>
+</html>
