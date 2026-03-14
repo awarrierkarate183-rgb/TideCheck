@@ -9,12 +9,14 @@ export default function RootLayout({ children }) {
           borderBottom: '1px solid rgba(255,255,255,0.1)',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: '8px',
+          flexWrap: 'wrap'
         }}>
           <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.1rem', marginRight: '16px' }}>🌿 BloomWatch</span>
           <a href="/home" style={{ color: '#90CAF9', textDecoration: 'none', padding: '6px 14px', borderRadius: '20px', fontSize: '0.9rem', border: '1px solid rgba(144,202,249,0.3)' }}>Home</a>
           <a href="/dashboard" style={{ color: '#90CAF9', textDecoration: 'none', padding: '6px 14px', borderRadius: '20px', fontSize: '0.9rem', border: '1px solid rgba(144,202,249,0.3)' }}>Dashboard</a>
           <a href="/game" style={{ color: '#2ECC71', textDecoration: 'none', padding: '6px 14px', borderRadius: '20px', fontSize: '0.9rem', border: '1px solid rgba(46,204,113,0.4)', background: 'rgba(46,204,113,0.1)' }}>🎮 Game</a>
+          <a href="/about" style={{ color: '#90CAF9', textDecoration: 'none', padding: '6px 14px', borderRadius: '20px', fontSize: '0.9rem', border: '1px solid rgba(144,202,249,0.3)' }}>About Us</a>
         </nav>
         {children}
       </body>
