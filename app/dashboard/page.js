@@ -21,7 +21,7 @@ function WaterGraphic({ risk_label }) {
   const scenes = {
     LOW: { bg: "linear-gradient(180deg, #87CEEB 0%, #1E90FF 40%, #006994 100%)", surface: "rgba(135,206,235,0.3)", particles: ["🐟", "🐠", "🐬", "🐙", "⭐"], text: "✨ Clean & Healthy Waters", textColor: "#90EE90", description: "Crystal clear and thriving" },
     MEDIUM: { bg: "linear-gradient(180deg, #8FBC8F 0%, #A3C86D 40%, #6B8E23 100%)", surface: "rgba(143,188,143,0.3)", particles: ["⚠️", "🌿", "🐟", "💚"], text: "⚡ Moderate Concern", textColor: "#FFD700", description: "Some algae activity detected" },
-    HIGH: { bg: "linear-gradient(180deg, #556B2F 0%, #3B5323 40%, #1A2E0F 100%)", surface: "rgba(85,107,47,0.3)", particles: ["🦠", "☠️", "🌊", "⚠️"], text: "🚨 Algae Bloom Detected", textColor: "#FF6B6B", description: "Dangerous bloom conditions" }
+    HIGH: { bg: "linear-gradient(180deg, #556B2F 0%, #3B5323 40%, #1A2E0F 100%)", surface: "rgba(85,107,47,0.3)", particles: ["🦠", "☠️", "🌿", "⚠️"], text: "🚨 Algae Bloom Detected", textColor: "#FF6B6B", description: "Dangerous bloom conditions" }
   };
 
   const scene = scenes[risk_label] || scenes.MEDIUM;
@@ -106,10 +106,11 @@ function DashboardContent() {
     return (
       <div style={{ background: "linear-gradient(180deg, #020B18 0%, #0A2342 40%, #0E6B8A 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "4rem", marginBottom: "16px", animation: "spin 2s linear infinite" }}>🌊</div>
+          <div style={{ fontSize: "4rem", marginBottom: "16px", animation: "spin 2s linear infinite" }}>🌿</div>
           <p style={{ color: "white", fontSize: "1.4rem", marginBottom: "8px" }}>Analyzing your water...</p>
           <p style={{ color: "#90CAF9", fontSize: "0.9rem" }}>Fetching live USGS data for ZIP {zip}</p>
         </div>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -120,7 +121,7 @@ function DashboardContent() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
-          <h1 style={{ color: "white", fontSize: "2.8rem", fontWeight: "900", marginBottom: "8px", textShadow: "0 0 30px rgba(14,107,138,0.8)" }}>🌊 TideCheck</h1>
+          <h1 style={{ color: "white", fontSize: "2.8rem", fontWeight: "900", marginBottom: "8px", textShadow: "0 0 30px rgba(46,204,113,0.6)" }}>🌿 BloomWatch</h1>
           <p style={{ color: "white", fontSize: "1.1rem", fontWeight: "600", marginBottom: "4px" }}>{waterData.water_name}</p>
           <p style={{ color: "#64B5F6", fontSize: "0.9rem" }}>{waterData.city}, {waterData.state} — ZIP {zip}</p>
         </div>
@@ -172,7 +173,7 @@ function DashboardContent() {
 
           {allChecked && (
             <div style={{ marginTop: "20px", textAlign: "center", padding: "16px", background: "rgba(46,204,113,0.15)", borderRadius: "12px", border: "1px solid rgba(46,204,113,0.3)" }}>
-              <p style={{ color: "#2ECC71", fontWeight: "bold", fontSize: "1.1rem" }}>🎉 Amazing! You are making a real difference! 🌊</p>
+              <p style={{ color: "#2ECC71", fontWeight: "bold", fontSize: "1.1rem" }}>🎉 Amazing! You are making a real difference! 🌿</p>
             </div>
           )}
 
@@ -187,7 +188,6 @@ function DashboardContent() {
         <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", borderRadius: "20px", padding: "28px", marginBottom: "20px", border: "1px solid rgba(255,255,255,0.15)", boxShadow: "0 8px 32px rgba(0,0,0,0.3)" }}>
           <h3 style={{ color: "white", fontSize: "1.3rem", fontWeight: "bold", marginBottom: "24px" }}>🌿 Local Ecosystem Impact</h3>
 
-          {/* Fish at risk */}
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>🐟 Fish Species at Risk</h4>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -195,7 +195,6 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Wildlife affected */}
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>🦅 Nearby Wildlife Affected</h4>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -203,7 +202,6 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Health effects */}
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>⚕️ Health Effects on Humans</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -216,7 +214,6 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Historical context */}
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>📅 Historical Context</h4>
             <p style={{ color: "#E3F2FD", fontSize: "0.9rem", lineHeight: "1.7", borderLeft: "3px solid #0E6B8A", paddingLeft: "14px" }}>
@@ -224,7 +221,6 @@ function DashboardContent() {
             </p>
           </div>
 
-          {/* Fun fact */}
           <div style={{ background: "rgba(241,196,15,0.1)", border: "1px solid rgba(241,196,15,0.3)", borderRadius: "14px", padding: "16px" }}>
             <h4 style={{ color: "#F1C40F", fontSize: "1rem", fontWeight: "bold", marginBottom: "8px" }}>💡 Did You Know?</h4>
             <p style={{ color: "#E3F2FD", fontSize: "0.9rem", lineHeight: "1.6" }}>{aiSummary?.fun_fact}</p>
@@ -263,7 +259,7 @@ export default function Dashboard() {
   return (
     <Suspense fallback={
       <div style={{ background: "linear-gradient(180deg, #020B18 0%, #0A2342 40%, #0E6B8A 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "white", fontSize: "1.5rem" }}>🌊 Loading...</p>
+        <p style={{ color: "white", fontSize: "1.5rem" }}>🌿 Loading...</p>
       </div>
     }>
       <DashboardContent />

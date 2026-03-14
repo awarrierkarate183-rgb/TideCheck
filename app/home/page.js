@@ -1,28 +1,22 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const [zip, setZip] = useState("");
   const [loading, setLoading] = useState(false);
-  const [tick, setTick] = useState(0);
   const router = useRouter();
-
-  useEffect(() => {
-    const interval = setInterval(() => setTick(t => t + 1), 50);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!zip || zip.length !== 5) return;
     setLoading(true);
-    router.push(`/dashboard?zip=${zip}`);
+    router.push(`/select?zip=${zip}`);
   };
 
   const handleDemo = () => {
     setLoading(true);
-    router.push(`/dashboard?zip=44102`);
+    router.push(`/select?zip=44102`);
   };
 
   return (
@@ -123,44 +117,12 @@ export default function HomePage() {
       </div>
 
       {/* Fish */}
-      <div style={{
-        position: "absolute",
-        bottom: "18%",
-        left: "-60px",
-        fontSize: "2rem",
-        animation: "swimAcross 18s linear infinite",
-      }}>🐠</div>
-      <div style={{
-        position: "absolute",
-        bottom: "35%",
-        left: "-60px",
-        fontSize: "1.5rem",
-        animation: "swimAcross 25s linear infinite",
-        animationDelay: "8s"
-      }}>🐟</div>
-      <div style={{
-        position: "absolute",
-        bottom: "55%",
-        right: "-60px",
-        fontSize: "1.8rem",
-        animation: "swimBack 20s linear infinite",
-        animationDelay: "3s"
-      }}>🐡</div>
+      <div style={{ position: "absolute", bottom: "18%", left: "-60px", fontSize: "2rem", animation: "swimAcross 18s linear infinite" }}>🐠</div>
+      <div style={{ position: "absolute", bottom: "35%", left: "-60px", fontSize: "1.5rem", animation: "swimAcross 25s linear infinite", animationDelay: "8s" }}>🐟</div>
+      <div style={{ position: "absolute", bottom: "55%", right: "-60px", fontSize: "1.8rem", animation: "swimBack 20s linear infinite", animationDelay: "3s" }}>🐡</div>
 
       {/* Coral bottom */}
-      <div style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: "60px",
-        background: "linear-gradient(180deg, transparent, rgba(10,35,66,0.8))",
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "center",
-        gap: "20px",
-        paddingBottom: "4px"
-      }}>
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "60px", background: "linear-gradient(180deg, transparent, rgba(10,35,66,0.8))", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "20px", paddingBottom: "4px" }}>
         {["🪸", "🪸", "🌿", "🪸", "🌿", "🪸", "🪸"].map((c, i) => (
           <span key={i} style={{ fontSize: "1.8rem" }}>{c}</span>
         ))}
@@ -168,28 +130,17 @@ export default function HomePage() {
 
       {/* Main content */}
       <div style={{ textAlign: "center", marginBottom: "40px", zIndex: 1 }}>
-        <div style={{ fontSize: "5rem", marginBottom: "8px" }}>🌊</div>
+        <div style={{ fontSize: "5rem", marginBottom: "8px" }}>🌿</div>
         <h1 style={{
           fontSize: "5rem",
           fontWeight: "900",
           color: "white",
           marginBottom: "12px",
-          textShadow: "0 0 40px rgba(14,107,138,0.8), 0 4px 20px rgba(0,0,0,0.5)",
+          textShadow: "0 0 40px rgba(46,204,113,0.6), 0 4px 20px rgba(0,0,0,0.5)",
           letterSpacing: "-2px"
-        }}>TideCheck</h1>
-        <p style={{
-          fontSize: "1.3rem",
-          color: "#90CAF9",
-          marginBottom: "4px",
-          letterSpacing: "2px",
-          textTransform: "uppercase"
-        }}>Know your water.</p>
-        <p style={{
-          fontSize: "1.3rem",
-          color: "#64B5F6",
-          letterSpacing: "2px",
-          textTransform: "uppercase"
-        }}>Protect your world.</p>
+        }}>BloomWatch</h1>
+        <p style={{ fontSize: "1.3rem", color: "#90CAF9", marginBottom: "4px", letterSpacing: "2px", textTransform: "uppercase" }}>Know your water.</p>
+        <p style={{ fontSize: "1.3rem", color: "#64B5F6", letterSpacing: "2px", textTransform: "uppercase" }}>Protect your world.</p>
       </div>
 
       {/* Card */}
@@ -204,21 +155,12 @@ export default function HomePage() {
         boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
         zIndex: 1
       }}>
-        <h2 style={{
-          color: "white",
-          fontSize: "1.6rem",
-          fontWeight: "700",
-          textAlign: "center",
-          marginBottom: "8px"
-        }}>Check Your Local Water</h2>
-
-        <p style={{
-          color: "#90CAF9",
-          textAlign: "center",
-          marginBottom: "28px",
-          fontSize: "1rem",
-          lineHeight: "1.5"
-        }}>Enter your ZIP code to get a real-time algal bloom risk report for your nearest water body</p>
+        <h2 style={{ color: "white", fontSize: "1.6rem", fontWeight: "700", textAlign: "center", marginBottom: "8px" }}>
+          Check Your Local Water
+        </h2>
+        <p style={{ color: "#90CAF9", textAlign: "center", marginBottom: "28px", fontSize: "1rem", lineHeight: "1.5" }}>
+          Enter your ZIP code to find the 5 nearest water bodies and their algal bloom risk
+        </p>
 
         <form onSubmit={handleSubmit}>
           <input
@@ -242,7 +184,6 @@ export default function HomePage() {
               letterSpacing: "4px"
             }}
           />
-
           <button
             type="submit"
             disabled={loading}
@@ -261,7 +202,7 @@ export default function HomePage() {
               transition: "all 0.2s"
             }}
           >
-            {loading ? "🌊 Loading..." : "Find My Water 🔍"}
+            {loading ? "🌿 Finding water bodies..." : "Find My Water 🔍"}
           </button>
         </form>
 
@@ -284,15 +225,9 @@ export default function HomePage() {
         </button>
 
         {/* Stats */}
-        <div style={{
-          display: "flex",
-          justifyContent: "space-around",
-          marginTop: "28px",
-          paddingTop: "20px",
-          borderTop: "1px solid rgba(255,255,255,0.1)"
-        }}>
+        <div style={{ display: "flex", justifyContent: "space-around", marginTop: "28px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
           {[
-            { number: "2,000+", label: "Water bodies tracked" },
+            { number: "5", label: "Nearest waters shown" },
             { number: "Real-time", label: "Live USGS data" },
             { number: "Any ZIP", label: "US coverage" },
           ].map((stat, i) => (
@@ -305,22 +240,10 @@ export default function HomePage() {
       </div>
 
       <style>{`
-        @keyframes swayL {
-          0%, 100% { transform: rotate(-8deg); }
-          50% { transform: rotate(8deg); }
-        }
-        @keyframes swayR {
-          0%, 100% { transform: rotate(8deg); }
-          50% { transform: rotate(-8deg); }
-        }
-        @keyframes swimAcross {
-          0% { left: -60px; }
-          100% { left: 110%; }
-        }
-        @keyframes swimBack {
-          0% { right: -60px; }
-          100% { right: 110%; }
-        }
+        @keyframes swayL { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+        @keyframes swayR { 0%, 100% { transform: rotate(8deg); } 50% { transform: rotate(-8deg); } }
+        @keyframes swimAcross { 0% { left: -60px; } 100% { left: 110%; } }
+        @keyframes swimBack { 0% { right: -60px; } 100% { right: 110%; } }
       `}</style>
 
     </main>
