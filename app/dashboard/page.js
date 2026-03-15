@@ -221,11 +221,12 @@ function DashboardContent() {
             </p>
           </div>
 
-          <div style={{ background: "rgba(241,196,15,0.1)", border: "1px solid rgba(241,196,15,0.3)", borderRadius: "14px", padding: "16px" }}>
-            <h4 style={{ color: "#F1C40F", fontSize: "1rem", fontWeight: "bold", marginBottom: "8px" }}>💡 Did You Know?</h4>
-            <p style={{ color: "#E3F2FD", fontSize: "0.9rem", lineHeight: "1.6" }}>{aiSummary?.fun_fact}</p>
+          <div style={{ marginBottom: "22px" }}>
+            <h4 style={{ color: "#F1C40F", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>💡 Did You Know?</h4>
+            <p style={{ color: "#E3F2FD", fontSize: "0.9rem", lineHeight: "1.7", borderLeft: "3px solid #F1C40F", paddingLeft: "14px" }}>
+              {aiSummary?.fun_fact}
+            </p>
           </div>
-        </div>
 
         {/* Footer */}
         <div style={{ textAlign: "center", color: "#64B5F6", fontSize: "0.85rem", paddingBottom: "40px" }}>
