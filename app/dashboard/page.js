@@ -190,16 +190,19 @@ function DashboardContent() {
 
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>🐟 Fish Species at Risk</h4>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {aiSummary?.fish_at_risk?.map((fish, i) => <Tag key={i} text={fish} color="#0E6B8A" />)}
-            </div>
+            <ul style={{ paddingLeft: "18px", margin: 0 }}>
+              {aiSummary?.fish_at_risk?.map((fish, i) => (
+                <li key={i} style={{ color: "#E3F2FD", fontSize: "0.9rem", lineHeight: "1.7" }}>{fish}</li>
+              ))}
+            </ul>
           </div>
-
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>🦅 Nearby Wildlife Affected</h4>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {aiSummary?.wildlife_affected?.map((animal, i) => <Tag key={i} text={animal} color="#2ECC71" />)}
-            </div>
+            <ul style={{ paddingLeft: "18px", margin: 0 }}>
+              {aiSummary?.wildlife_affected?.map((animal, i) => (
+                <li key={i} style={{ color: "#E3F2FD", fontSize: "0.9rem", lineHeight: "1.7" }}>{animal}</li>
+              ))}
+            </ul>
           </div>
 
           <div style={{ marginBottom: "22px" }}>
