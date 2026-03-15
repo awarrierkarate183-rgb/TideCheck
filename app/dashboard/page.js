@@ -54,10 +54,109 @@ function MetricCard({ label, value, unit, icon }) {
   );
 }
 
-function Tag({ text, color }) {
+function BulletList({ items, color }) {
   return (
-    <div style={{ background: `${color}22`, border: `1px solid ${color}55`, borderRadius: "20px", padding: "6px 14px", color: "#E3F2FD", fontSize: "0.9rem" }}>
-      {text}
+    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      {items?.map((item, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+          <span style={{ color: color, fontSize: "1rem", marginTop: "2px", flexShrink: 0 }}>•</span>
+          <span style={{ color: "#E3F2FD", fontSize: "0.95rem", lineHeight: "1.6" }}>{item}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LearnMoreModal({ waterData, onClose }) {
+  const usgsUrl = `https://waterdata.usgs.gov/monitoring-location/${waterData.station_id}/`;
+  const epaUrl = `https://www.epa.gov/nutrientpollution/effects-dead-zones-and-harmful-algal-blooms`;
+  const habUrl = `https://www.cdc.gov/harmful-algal-blooms/about/index.html`;
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(2,11,24,0.9)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "linear-gradient(180deg, #0A2342, #0E6B8A)", borderRadius: "24px", padding: "32px", maxWidth: "640px", width: "100%", maxHeight: "85vh", overflowY: "auto", border: "1px solid rgba(255,255,255,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "24px" }}>
+          <div>
+            <h2 style={{ color: "white", fontSize: "1.4rem", fontWeight: "bold", marginBottom: "4px" }}>📖 More About This Water Body</h2>
+            <p style={{ color: "#90CAF9", fontSize: "0.9rem" }}>{waterData.water_name}</p>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "50%", width: "36px", height: "36px", color: "white", cursor: "pointer", fontSize: "1.1rem", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+        </div>
+
+        {/* Station info */}
+        <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: "16px", padding: "20px", marginBottom: "16px", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <h3 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "14px" }}>📡 Monitoring Station Details</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {[
+              { label: "Station Name", value: waterData.water_name },
+              { label: "Station ID", value: waterData.station_id },
+              { label: "Location", value: `${waterData.city}, ${waterData.state}` },
+              { label: "Coordinates", value: `${waterData.lat?.toFixed(4)}°N, ${waterData.lng?.toFixed(4)}°W` },
+              { label: "Current Temperature", value: waterData.metrics?.temperature ? `${waterData.metrics.temperature}°C` : "N/A" },
+              { label: "Risk Score", value: `${waterData.risk_score}/100` },
+              { label: "Risk Level", value: waterData.risk_label },
+              { label: "Last Updated", value: new Date(waterData.last_updated).toLocaleString() },
+            ].map((item, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <span style={{ color: "#90CAF9", fontSize: "0.85rem" }}>{item.label}</span>
+                <span style={{ color: "white", fontSize: "0.85rem", fontWeight: "600", textAlign: "right", maxWidth: "60%" }}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* What are algal blooms */}
+        <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: "16px", padding: "20px", marginBottom: "16px", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <h3 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>🦠 What Are Harmful Algal Blooms?</h3>
+          <p style={{ color: "#E3F2FD", fontSize: "0.9rem", lineHeight: "1.7", marginBottom: "12px" }}>
+            Harmful Algal Blooms (HABs) occur when colonies of algae grow out of control in water bodies. They are fueled by excess nutrients — mainly nitrogen and phosphorus — from agricultural runoff, sewage, and urban stormwater.
+          </p>
+          <p style={{ color: "#E3F2FD", fontSize: "0.9rem", lineHeight: "1.7" }}>
+            When algae die and decompose, they deplete oxygen in the water — creating "dead zones" where fish and other aquatic life cannot survive. Some blooms produce toxins that are dangerous to humans, pets, and wildlife.
+          </p>
+        </div>
+
+        {/* Risk level explanation */}
+        <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: "16px", padding: "20px", marginBottom: "16px", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <h3 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "14px" }}>📊 Understanding Risk Levels</h3>
+          {[
+            { level: "LOW", color: "#2ECC71", range: "0–32", desc: "Water conditions are healthy. Normal recreational activities are generally safe." },
+            { level: "MEDIUM", color: "#F1C40F", range: "33–66", desc: "Some concern. Monitor conditions. Avoid swallowing water and rinse off after contact." },
+            { level: "HIGH", color: "#E74C3C", range: "67–100", desc: "Dangerous conditions. Avoid all contact with water. Keep pets away from the shoreline." },
+          ].map((r, i) => (
+            <div key={i} style={{ display: "flex", gap: "12px", alignItems: "flex-start", marginBottom: "12px" }}>
+              <div style={{ background: r.color, color: "white", fontWeight: "bold", fontSize: "0.75rem", padding: "4px 10px", borderRadius: "12px", flexShrink: 0, marginTop: "2px" }}>{r.level}</div>
+              <div>
+                <span style={{ color: r.color, fontSize: "0.8rem", fontWeight: "bold" }}>Score {r.range} — </span>
+                <span style={{ color: "#E3F2FD", fontSize: "0.85rem" }}>{r.desc}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* External links */}
+        <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: "16px", padding: "20px", marginBottom: "16px", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <h3 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "14px" }}>🔗 Official Resources</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {[
+              { label: "📡 View Live Station Data on USGS", url: usgsUrl, color: "#0E6B8A" },
+              { label: "🏛️ EPA Nutrient Pollution & HABs", url: epaUrl, color: "#2ECC71" },
+              { label: "🦠 CDC Harmful Algal Blooms Guide", url: habUrl, color: "#F1C40F" },
+            ].map((link, i) => (
+              <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px", background: `${link.color}15`, border: `1px solid ${link.color}44`, borderRadius: "12px", textDecoration: "none", transition: "all 0.2s" }}>
+                <span style={{ color: link.color, fontSize: "0.9rem", fontWeight: "600" }}>{link.label}</span>
+                <span style={{ color: link.color, marginLeft: "auto" }}>→</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={onClose} style={{ width: "100%", padding: "14px", borderRadius: "14px", background: "linear-gradient(90deg, #0E6B8A, #2ECC71)", color: "white", fontWeight: "700", fontSize: "1rem", border: "none", cursor: "pointer" }}>
+          Close ✕
+        </button>
+      </div>
     </div>
   );
 }
@@ -69,7 +168,7 @@ function DashboardContent() {
   const [aiSummary, setAiSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [checked, setChecked] = useState({});
+  const [showLearnMore, setShowLearnMore] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -99,9 +198,6 @@ function DashboardContent() {
     fetchData();
   }, [zip]);
 
-  const toggleCheck = (idx) => setChecked(prev => ({ ...prev, [idx]: !prev[idx] }));
-  const allChecked = aiSummary?.actions?.length > 0 && aiSummary.actions.every((_, i) => checked[i]);
-
   if (loading || !waterData || !mounted) {
     return (
       <div style={{ background: "linear-gradient(180deg, #020B18 0%, #0A2342 40%, #0E6B8A 100%)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif" }}>
@@ -117,6 +213,8 @@ function DashboardContent() {
 
   return (
     <div style={{ background: "linear-gradient(180deg, #020B18 0%, #0A2342 40%, #0E6B8A 100%)", minHeight: "100vh", fontFamily: "sans-serif", padding: "24px 16px" }}>
+      {showLearnMore && <LearnMoreModal waterData={waterData} onClose={() => setShowLearnMore(false)} />}
+
       <div style={{ maxWidth: "860px", margin: "0 auto" }}>
 
         {/* Header */}
@@ -154,28 +252,20 @@ function DashboardContent() {
           </MapContainer>
         </div>
 
+        {/* Learn More Button */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "28px" }}>
+          <button onClick={() => setShowLearnMore(true)} style={{ padding: "14px 32px", borderRadius: "14px", background: "rgba(255,255,255,0.08)", border: "2px solid rgba(144,202,249,0.4)", color: "#90CAF9", fontWeight: "700", fontSize: "1rem", cursor: "pointer", transition: "all 0.2s", backdropFilter: "blur(10px)" }}>
+            📖 Learn More About This Water Body
+          </button>
+        </div>
+
         {/* AI Summary Card */}
         <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", borderRadius: "20px", padding: "28px", marginBottom: "20px", border: "1px solid rgba(255,255,255,0.15)", boxShadow: "0 8px 32px rgba(0,0,0,0.3)" }}>
           <h3 style={{ color: "white", fontSize: "1.3rem", fontWeight: "bold", marginBottom: "16px" }}>💬 Water Report</h3>
           <p style={{ color: "#E3F2FD", lineHeight: "1.8", marginBottom: "24px", fontSize: "1rem", fontStyle: "italic", borderLeft: `4px solid ${riskColors[waterData.risk_label]}`, paddingLeft: "16px" }}>{aiSummary?.summary}</p>
 
           <h4 style={{ color: "white", fontWeight: "bold", marginBottom: "16px", fontSize: "1.1rem" }}>✅ What You Can Do This Week</h4>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {aiSummary?.actions?.map((action, idx) => (
-              <div key={idx} onClick={() => toggleCheck(idx)} style={{ display: "flex", alignItems: "center", gap: "14px", cursor: "pointer", padding: "12px 16px", borderRadius: "12px", background: checked[idx] ? "rgba(46,204,113,0.15)" : "rgba(255,255,255,0.05)", border: `1px solid ${checked[idx] ? "rgba(46,204,113,0.4)" : "rgba(255,255,255,0.1)"}`, transition: "all 0.2s" }}>
-                <div style={{ width: "24px", height: "24px", borderRadius: "8px", border: `2px solid ${checked[idx] ? "#2ECC71" : "rgba(255,255,255,0.3)"}`, background: checked[idx] ? "#2ECC71" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
-                  {checked[idx] && <span style={{ color: "white", fontSize: "14px", fontWeight: "bold" }}>✓</span>}
-                </div>
-                <span style={{ color: checked[idx] ? "#2ECC71" : "#E3F2FD", textDecoration: checked[idx] ? "line-through" : "none", fontSize: "0.95rem", transition: "all 0.2s" }}>{action}</span>
-              </div>
-            ))}
-          </div>
-
-          {allChecked && (
-            <div style={{ marginTop: "20px", textAlign: "center", padding: "16px", background: "rgba(46,204,113,0.15)", borderRadius: "12px", border: "1px solid rgba(46,204,113,0.3)" }}>
-              <p style={{ color: "#2ECC71", fontWeight: "bold", fontSize: "1.1rem" }}>🎉 Amazing! You are making a real difference! 🌿</p>
-            </div>
-          )}
+          <BulletList items={aiSummary?.actions} color="#2ECC71" />
 
           {aiSummary?.safety_note && (
             <div style={{ marginTop: "16px", padding: "14px 18px", background: "rgba(231,76,60,0.15)", borderRadius: "12px", border: "1px solid rgba(231,76,60,0.35)" }}>
@@ -190,28 +280,17 @@ function DashboardContent() {
 
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>🐟 Fish Species at Risk</h4>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {aiSummary?.fish_at_risk?.map((fish, i) => <Tag key={i} text={fish} color="#0E6B8A" />)}
-            </div>
+            <BulletList items={aiSummary?.fish_at_risk} color="#64B5F6" />
           </div>
 
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>🦅 Nearby Wildlife Affected</h4>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {aiSummary?.wildlife_affected?.map((animal, i) => <Tag key={i} text={animal} color="#2ECC71" />)}
-            </div>
+            <BulletList items={aiSummary?.wildlife_affected} color="#2ECC71" />
           </div>
 
           <div style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "#90CAF9", fontSize: "1rem", fontWeight: "bold", marginBottom: "12px" }}>⚕️ Health Effects on Humans</h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {aiSummary?.health_effects?.map((effect, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "rgba(231,76,60,0.1)", borderRadius: "10px", border: "1px solid rgba(231,76,60,0.2)" }}>
-                  <span style={{ fontSize: "1rem" }}>⚠️</span>
-                  <span style={{ color: "#E3F2FD", fontSize: "0.9rem" }}>{effect}</span>
-                </div>
-              ))}
-            </div>
+            <BulletList items={aiSummary?.health_effects} color="#E74C3C" />
           </div>
 
           <div style={{ marginBottom: "22px" }}>
