@@ -16,7 +16,7 @@ export async function POST(request) {
 - Temperature: ${metrics.temperature ?? "unknown"}°C
 - Risk Level: ${risk_label}
 
-Respond ONLY with a raw JSON object. Do not wrap it in markdown, do not use backticks, do not add any text before or after. Just the JSON object itself:
+Respond ONLY with a valid JSON object:
 {
   "summary": "4-5 sentences in first person as the water body, deeply personal and emotional about your current health condition, describing what you look like and feel",
   "actions": ["action 1", "action 2", "action 3", "action 4", "action 5"],
